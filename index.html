@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FLIX PRO - FINAL 67MB</title>
+<title>FLIX PRO - FINAL 67MB CORRIGIDO</title>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.7/dist/hls.min.js"></script>
 <style>
 :root{--red:#e50914;--bg:#0f0f0f;--card:#1f1f1f}
@@ -51,16 +51,14 @@ header{position:fixed;top:0;width:100%;z-index:30;display:flex;align-items:cente
 </div>
 <div class="search"><input id="searchInput" placeholder="Buscar..." oninput="applyFilters()"></div>
 </header>
-<div class="hero" id="hero" style="background-image:url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1600')"><div class="hero-content"><h1 id="heroTitle">Carregando 67MB...</h1><p id="heroDesc" style="color:#bbb;font-size:12px;margin:6px 0">Buzzheavier yspsvt4adud3</p><button class="btn-play" onclick="playFirst()">▶ Assistir</button></div></div>
-<div id="statusBar"><span id="status">Baixando lista do Buzzheavier...</span></div>
+<div class="hero" id="hero" style="background-image:url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1600')"><div class="hero-content"><h1 id="heroTitle">Carregando 67MB...</h1><p id="heroDesc" style="color:#bbb;font-size:12px;margin:6px 0">Buzzheavier yspsvt4adud3 - FINAL</p><button class="btn-play" onclick="playFirst()">▶ Assistir</button></div></div>
+<div id="statusBar"><span id="status">Iniciando download...</span></div>
 <div class="rows" id="rows"></div>
 <div id="playerModal"><div class="player-top"><button onclick="closePlayer()" style="background:#222;color:#fff;border:none;padding:6px 12px;border-radius:4px">◀ Voltar</button><span id="nowPlaying" style="font-size:12px;font-weight:700;max-width:60%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span><button onclick="closePlayer()" style="background:var(--red);color:#fff;border:none;padding:6px 12px;border-radius:4px">✕</button></div><div id="videoWrap"><div id="spinner"></div><video id="video" controls autoplay playsinline preload="auto"></video></div></div>
 
 <script>
-// SEU ARQUIVO 67MB
 const BUZZ_ID="yspsvt4adud3";
 let allChannels=[],filtered=[],currentFilter='all',hls=null;
-
 function classify(n,g){const s=(n+" "+g).toLowerCase();if(s.includes("filme")||s.includes("movie")||s.includes("cinema")||(s.includes("vod")&&!s.includes("serie")))return"filme";if(s.includes("serie")||s.includes("série")||s.includes("temporada")||s.includes("epis")||s.includes("novela")||s.includes("anime")||s.includes("dorama"))return"serie";return"tv";}
 function parseM3U(text){const lines=text.split("\n");const chans=[];for(let i=0;i<lines.length;i++){const l=lines[i].trim();if(l.startsWith("#EXTINF")){const n=(l.match(/,(.*)$/)||[,"Canal"])[1].trim();const g=(l.match(/group-title="([^"]+)"/)||[,"Geral"])[1];const lo=(l.match(/tvg-logo="([^"]+)"/)||["",""])[1];const u=(lines[i+1]||"").trim();if(u.startsWith("http"))chans.push({name:n,group:g,logo:lo,url:u,type:classify(n,g)});}}return chans;}
 function setFilter(f){currentFilter=f;document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.filter===f));applyFilters();}
@@ -70,54 +68,55 @@ function updateCounts(){document.getElementById("c-all").innerText=allChannels.l
 
 async function loadAll(){
  const status=document.getElementById("status");
- try{
-  // tenta direto via proxy do Buzzheavier
-  const urls=[
-   `https://buzzheavier.com/${BUZZ_ID}/download`,
-   `https://api.buzzheavier.com/file/${BUZZ_ID}/download`,
-   `https://buzzheavier.com/d/${BUZZ_ID}/download`
-  ];
-  let text=null;
-  for(let u of urls){
-   try{
-    status.innerText=`Tentando ${u}...`;
-    const r=await fetch(u);
-    if(r.ok){
-     const ct=r.headers.get("content-type")||"";
-     if(ct.includes("text")||ct.includes("mpeg")||r.headers.get("content-length")>1000000){
-      text=await r.text();
-      if(text.includes("#EXTM3U")) break;
-     }
+ const proxies=[
+  `https://corsproxy.io/?https://buzzheavier.com/${BUZZ_ID}/download`,
+  `https://api.allorigins.win/raw?url=https://buzzheavier.com/${BUZZ_ID}/download`,
+  `https://cors-anywhere.herokuapp.com/https://buzzheavier.com/${BUZZ_ID}/download`
+ ];
+ let text=null;
+ for(let proxy of proxies){
+  try{
+   status.innerText=`Baixando 67MB via proxy... aguarde 10s`;
+   const r=await fetch(proxy);
+   if(r.ok){
+    text=await r.text();
+    if(text && text.includes("#EXTM3U") && text.length > 100000){
+     break;
     }
-   }catch(e){console.log("falhou",u,e);}
-  }
-  // fallback via cors proxy
-  if(!text||!text.includes("#EXTM3U")){
-   status.innerText="Tentando via proxy...";
-   const proxyUrl=`https://corsproxy.io/?https://buzzheavier.com/${BUZZ_ID}/download`;
-   const r=await fetch(proxyUrl);
-   text=await r.text();
-  }
-  if(!text||!text.includes("#EXTM3U")) throw new Error("Não consegui ler M3U");
-  const chans=parseM3U(text);
-  allChannels=chans; filtered=chans;
-  status.innerText=`${chans.length} conteúdos carregados - TV:${chans.filter(c=>c.type==='tv').length} FILMES:${chans.filter(c=>c.type==='filme').length} SÉRIES:${chans.filter(c=>c.type==='serie').length} (67MB OK)`;
-  if(chans.length){document.getElementById("heroTitle").innerText=chans[0].name;document.getElementById("heroDesc").innerText=chans[0].group;if(chans[0].logo)document.getElementById("hero").style.backgroundImage=`url(${chans[0].logo})`;}
-  updateCounts(); render(chans);
- }catch(e){
-  status.innerText="Erro: "+e.message+" - Clique em 'Copy download link' no Buzzheavier e me mande o link que começa com store";
-  console.error(e);
+   }
+  }catch(e){console.log("Proxy falhou",proxy);}
  }
+ if(!text||!text.includes("#EXTM3U")){
+  status.innerText=`ERRO: Buzzheavier bloqueou. SOLUÇÃO RÁPIDA: No Buzzheavier clique em "Copy download link" e cole aqui, ou suba no https://catbox.moe`;
+  return;
+ }
+ const chans=parseM3U(text);
+ allChannels=chans; filtered=chans;
+ status.innerText=`${chans.length} conteúdos - TV:${chans.filter(c=>c.type==='tv').length} FILMES:${chans.filter(c=>c.type==='filme').length} SÉRIES:${chans.filter(c=>c.type==='serie').length} - 67MB OK!`;
+ if(chans.length){document.getElementById("heroTitle").innerText=chans[0].name;document.getElementById("heroDesc").innerText=chans[0].group;if(chans[0].logo)document.getElementById("hero").style.backgroundImage=`url(${chans[0].logo})`;}
+ updateCounts(); render(chans);
 }
 
 function play(url,title){
  const modal=document.getElementById("playerModal");const video=document.getElementById("video");const spinner=document.getElementById("spinner");
  document.getElementById("nowPlaying").innerText=title;spinner.style.display="block";modal.classList.add("active");
  if(hls){try{hls.destroy()}catch(e){}hls=null;}video.pause();video.removeAttribute("src");video.load();
- const isMp4=url.toLowerCase().includes(".mp4")||url.toLowerCase().includes(".mkv")||url.toLowerCase().includes(".avi");
+ const isMp4=url.toLowerCase().includes(".mp4")||url.toLowerCase().includes(".mkv")||url.toLowerCase().includes(".avi")||url.toLowerCase().includes(".mpd");
  let finalUrl=url; if(isMp4&&url.startsWith("http://")) finalUrl=url.replace("http://","https://");
- if(isMp4){video.src=finalUrl;video.play().then(()=>{spinner.style.display="none";}).catch(()=>{video.src=url;video.play().then(()=>{spinner.style.display="none";}).catch(()=>{spinner.style.display="none";});});}
- else{const cfg={enableWorker:true,lowLatencyMode:true,maxBufferLength:12};if(Hls.isSupported()){hls=new Hls(cfg);hls.loadSource(finalUrl);hls.attachMedia(video);hls.on(Hls.Events.MANIFEST_PARSED,()=>{spinner.style.display="none";video.play();});hls.on(Hls.Events.ERROR,(ev,d)=>{if(d.fatal){spinner.style.display="none";video.src=finalUrl;video.play();}});}else{video.src=finalUrl;video.play();spinner.style.display="none";}}
+ if(isMp4){
+  video.src=finalUrl;video.play().then(()=>{spinner.style.display="none";}).catch(()=>{
+   spinner.style.display="none";
+   // tenta http original
+   video.src=url;video.play().catch(()=>{alert("Link offline ou bloqueado: "+title);closePlayer();});
+  });
+ }else{
+  const cfg={enableWorker:true,lowLatencyMode:true,maxBufferLength:12};
+  if(Hls.isSupported()){
+   hls=new Hls(cfg);hls.loadSource(finalUrl);hls.attachMedia(video);
+   hls.on(Hls.Events.MANIFEST_PARSED,()=>{spinner.style.display="none";video.play();});
+   hls.on(Hls.Events.ERROR,(ev,d)=>{if(d.fatal){console.log(d);spinner.style.display="none";video.src=finalUrl;video.play();}});
+  }else{video.src=finalUrl;video.play();spinner.style.display="none";}
+ }
 }
 function closePlayer(){document.getElementById("playerModal").classList.remove("active");const v=document.getElementById("video");v.pause();v.removeAttribute("src");v.load();if(hls){try{hls.destroy()}catch(e){}hls=null;}document.getElementById("spinner").style.display="none";}
 function playFirst(){if(filtered.length)play(filtered[0].url,filtered[0].name);}
