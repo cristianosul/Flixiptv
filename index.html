@@ -76,6 +76,81 @@ async function loadAuto(){const status=document.getElementById("status");const c
 function play(url,title){const m=document.getElementById("playerModal");const v=document.getElementById("video");document.getElementById("nowPlaying").innerText=title;m.classList.add("active");if(hls){try{hls.destroy()}catch(e){}hls=null;}v.pause();v.removeAttribute("src");v.load();const cfg={enableWorker:true,lowLatencyMode:true,maxBufferLength:12};if(Hls.isSupported()){hls=new Hls(cfg);hls.loadSource(url);hls.attachMedia(v);hls.on(Hls.Events.MANIFEST_PARSED,()=>v.play());}else{v.src=url;v.play();}}
 function closePlayer(){document.getElementById("playerModal").classList.remove("active");const v=document.getElementById("video");v.pause();v.removeAttribute("src");v.load();if(hls){try{hls.destroy()}catch(e){}hls=null;}}
 loadAuto();
+<script>
+// ... mantém o resto igual até a função play
+
+function play(url,title){
+ const modal=document.getElementById("playerModal");
+ const video=document.getElementById("video");
+ const status=document.getElementById("nowPlaying");
+ status.innerText=title;
+ modal.classList.add("active");
+ document.getElementById("spinner") && (document.getElementById("spinner").style.display="block");
+
+ // LIMPA PLAYER ANTERIOR
+ if(hls){try{hls.destroy()}catch(e){}hls=null;}
+ video.pause();
+ video.removeAttribute("src");
+ video.load();
+
+ // DETECTA TIPO
+ const isMp4 = url.toLowerCase().includes(".mp4") || url.toLowerCase().includes(".mkv") || url.toLowerCase().includes(".avi");
+ const isM3u8 = url.toLowerCase().includes(".m3u8");
+
+ // Conserta http -> https para filme (resolve 90% dos casos)
+ let finalUrl = url;
+ if(isMp4 && url.startsWith("http://")){
+   // tenta https primeiro (mais rápido)
+   finalUrl = url.replace("http://","https://");
+ }
+
+ console.log("Tocando:", finalUrl, "Tipo:", isMp4?"MP4 Filme":"M3U8 TV");
+
+ if(isMp4){
+   // FILME - reproduz direto, sem HLS, abre instantâneo
+   video.src = finalUrl;
+   video.preload = "auto";
+   video.play().then(()=>{
+     document.getElementById("spinner").style.display="none";
+   }).catch(e=>{
+     console.log("Erro https, tentando http com proxy", e);
+     // se https falhar, tenta com proxy de video
+     video.src = "https://cors.luckydesigner.workers.dev/?"+url;
+     video.play();
+     document.getElementById("spinner").style.display="none";
+   });
+   video.onerror = ()=>{
+     // fallback final
+     document.getElementById("nowPlaying").innerText = "Erro ao carregar filme - link http bloqueado. Tente baixar o app VLC";
+   };
+ } else {
+   // TV AO VIVO - usa HLS com config ultra leve
+   const cfg={enableWorker:true,lowLatencyMode:true,backBufferLength:8,maxBufferLength:12,liveSyncDurationCount:1,maxMaxBufferLength:20};
+   if(Hls.isSupported()){
+     hls=new Hls(cfg);
+     hls.loadSource(finalUrl);
+     hls.attachMedia(video);
+     hls.on(Hls.Events.MANIFEST_PARSED,()=>{document.getElementById("spinner").style.display="none"; video.play();});
+     hls.on(Hls.Events.ERROR,(ev,data)=>{
+       if(data.fatal){
+         console.log("HLS falhou, tentando mp4 direto");
+         video.src=finalUrl;
+         video.play();
+         document.getElementById("spinner").style.display="none";
+       }
+     });
+   } else {
+     video.src=finalUrl;
+     video.play();
+     document.getElementById("spinner").style.display="none";
+   }
+ }
+}
+
+function closePlayer(){
+ document.getElementById("playerModal").classList.remove("active");
+ const v=document.getElementById("video");
+ v.pause(); v.removeAttribute("src"); v.load();
+ if(hls){try{hls.destroy()}catch(e){}hls=null;}
+}
 </script>
-</body>
-</html>
