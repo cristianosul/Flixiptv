@@ -2,66 +2,52 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FLIX PRO</title>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.7/dist/hls.min.js"></script>
 <style>
-:root{--red:#e50914;--bg:#0f0f0f;--bg2:#141414;--card:#1f1f1f;--gray:#808080}
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial}
-body{background:var(--bg);color:#fff;overflow-x:hidden}
-header{position:fixed;top:0;width:100%;z-index:30;display:flex;align-items:center;gap:24px;padding:12px 4%;background:linear-gradient(180deg,#000 60%,transparent);transition:.3s}
-header.scrolled{background:var(--bg2);box-shadow:0 2px 10px rgba(0,0,0,.8)}
-.logo{color:var(--red);font-weight:900;font-size:28px;letter-spacing:-1px}
-.tabs{display:flex;gap:8px;flex:1;overflow-x:auto}
+:root{--red:#e50914;--bg:#0f0f0f;--card:#1f1f1f}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+body{background:var(--bg);color:#fff}
+header{position:fixed;top:0;width:100%;z-index:30;display:flex;align-items:center;gap:16px;padding:10px 3%;background:#000}
+.logo{color:var(--red);font-weight:900;font-size:26px}
+.tabs{display:flex;gap:6px;flex:1;overflow-x:auto}
 .tabs::-webkit-scrollbar{display:none}
-.tab{padding:7px 16px;border-radius:20px;background:rgba(255,255,255,.12);border:none;color:#ccc;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.2s}
+.tab{padding:6px 14px;border-radius:20px;background:#222;border:none;color:#aaa;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
 .tab.active{background:#fff;color:#000}
-.tab span{opacity:.7;font-size:11px;margin-left:4px}
-.search{margin-left:auto}
-.search input{background:rgba(0,0,0,.6);border:1px solid #333;color:#fff;padding:8px 14px;border-radius:4px;width:200px;outline:none;transition:.2s}
-.search input:focus{border-color:#fff;width:260px}
-.hero{height:58vh;min-height:380px;position:relative;display:flex;align-items:flex-end;padding:0 4% 40px;background-size:cover;background-position:center top;transition:background-image .5s}
-.hero::before{content:"";position:absolute;inset:0;background:linear-gradient(77deg,rgba(0,0,0,.9) 0,rgba(0,0,0,.4) 50%,transparent 85%)}
-.hero::after{content:"";position:absolute;bottom:0;left:0;right:0;height:120px;background:linear-gradient(0deg,var(--bg),transparent)}
+.search input{background:#111;border:1px solid #333;color:#fff;padding:7px 12px;border-radius:4px;width:160px}
+.hero{height:55vh;min-height:360px;position:relative;display:flex;align-items:flex-end;padding:0 4% 36px;background-size:cover;background-position:center top}
+.hero::before{content:"";position:absolute;inset:0;background:linear-gradient(77deg,rgba(0,0,0,.9),transparent 70%)}
+.hero::after{content:"";position:absolute;bottom:0;left:0;right:0;height:100px;background:linear-gradient(0deg,var(--bg),transparent)}
 .hero-content{position:relative;z-index:2;max-width:600px}
-.badge{display:inline-block;background:var(--red);padding:3px 8px;border-radius:3px;font-size:10px;font-weight:900;margin-bottom:10px}
-.hero h1{font-size:38px;line-height:1.1;margin-bottom:8px;text-shadow:2px 2px 8px #000}
-.hero p{color:#bbb;font-size:14px;margin-bottom:14px}
-.btn{padding:10px 22px;border:none;border-radius:4px;font-weight:800;cursor:pointer;font-size:14px;display:inline-flex;align-items:center;gap:6px}
-.btn-play{background:#fff;color:#000}.btn-play:hover{background:rgba(255,255,255,.85)}
-.btn-list{background:rgba(109,109,110,.7);color:#fff;margin-left:8px}
+.badge{background:var(--red);padding:3px 7px;border-radius:3px;font-size:10px;font-weight:900;margin-bottom:8px;display:inline-block}
+.hero h1{font-size:34px;margin-bottom:6px}
+.btn{padding:9px 18px;border:none;border-radius:4px;font-weight:800;cursor:pointer}
+.btn-play{background:#fff;color:#000}
 .rows{position:relative;z-index:2}
-.row{padding:12px 4%}
-.row-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.row h2{font-size:18px;font-weight:700}
-.row .count{color:var(--gray);font-size:12px}
-.carousel{display:flex;gap:8px;overflow-x:auto;overflow-y:hidden;padding:6px 0 14px;scroll-behavior:smooth}
+.row{padding:10px 3%}
+.carousel{display:flex;gap:8px;overflow-x:auto;padding:6px 0 12px}
 .carousel::-webkit-scrollbar{display:none}
-.card{min-width:150px;max-width:150px;height:84px;background:var(--card);border-radius:4px;overflow:hidden;cursor:pointer;flex-shrink:0;position:relative;transition:transform .18s}
-.card.movie{min-width:132px;max-width:132px;height:198px}
-.card.serie{min-width:132px;max-width:132px;height:198px}
-.card:hover{transform:scale(1.06);z-index:4;outline:2px solid #fff}
-.card img{width:100%;height:100%;object-fit:cover;display:block;background:#222}
-.card .title{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(0deg,#000 85%,transparent);padding:7px 6px;font-size:11px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card .live{position:absolute;top:5px;left:5px;background:var(--red);font-size:8px;padding:2px 5px;border-radius:2px;font-weight:900;letter-spacing:.5px}
+.card{min-width:145px;max-width:145px;height:82px;background:var(--card);border-radius:4px;overflow:hidden;cursor:pointer;flex-shrink:0;position:relative;transition:.15s}
+.card.movie{min-width:120px;max-width:120px;height:180px}
+.card:hover{transform:scale(1.05);outline:2px solid #fff}
+.card img{width:100%;height:100%;object-fit:cover;background:#222}
+.card .title{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(0deg,#000 85%,transparent);padding:6px 5px;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .live{position:absolute;top:4px;left:4px;background:var(--red);font-size:8px;padding:2px 4px;border-radius:2px;font-weight:900}
 #playerModal{position:fixed;inset:0;background:#000;z-index:100;display:none;flex-direction:column}
 #playerModal.active{display:flex}
-.player-top{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:#0a0a0a;border-bottom:1px solid #222}
-.player-top-left{display:flex;align-items:center;gap:12px}
-#nowPlaying{font-weight:700;font-size:14px;max-width:60vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#playerStatus{font-size:11px;color:#999}
+.player-top{display:flex;justify-content:space-between;padding:10px 14px;background:#0a0a0a;border-bottom:1px solid #222;align-items:center}
 #videoWrap{flex:1;position:relative;background:#000;display:flex;align-items:center;justify-content:center}
-#video{width:100%;height:100%;max-height:calc(100vh - 52px);background:#000}
-#spinner{position:absolute;width:40px;height:40px;border:3px solid #333;border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite;display:none}
+#video{width:100%;height:100%;background:#000}
+#spinner{position:absolute;width:36px;height:36px;border:3px solid #333;border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite;display:none}
 @keyframes spin{to{transform:rotate(360deg)}}
-#statusBar{padding:12px 4%;background:#191919;color:#888;font-size:12px;display:flex;gap:16px;align-items:center;border-bottom:1px solid #222}
-.dot{width:8px;height:8px;background:#0f0;border-radius:50%;display:inline-block;animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.empty{padding:40px 4%;text-align:center;color:#666}
+#statusBar{padding:10px 3%;background:#191919;color:#888;font-size:12px;display:flex;gap:10px;align-items:center}
+.dot{width:8px;height:8px;background:#0f0;border-radius:50%;display:inline-block}
+#log{padding:8px 3%;font-size:10px;color:#666;white-space:pre-wrap;max-height:100px;overflow:auto;background:#111}
 </style>
 </head>
 <body>
-<header id="header">
+<header>
 <div class="logo">FLIX</div>
 <div class="tabs">
 <button class="tab active" data-filter="all" onclick="setFilter('all')">TODOS <span id="c-all">0</span></button>
@@ -72,27 +58,20 @@ header.scrolled{background:var(--bg2);box-shadow:0 2px 10px rgba(0,0,0,.8)}
 <div class="search"><input id="searchInput" placeholder="Buscar..." oninput="applyFilters()"></div>
 </header>
 <div class="hero" id="hero" style="background-image:url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1600')">
-<div class="hero-content">
-<span class="badge" id="heroBadge">AO VIVO</span>
-<h1 id="heroTitle">Carregando sua lista...</h1>
-<p id="heroDesc">Organizando por categorias</p>
-<button class="btn btn-play" onclick="playFirst()">▶ Assistir</button>
+<div class="hero-content"><span class="badge" id="heroBadge">AO VIVO</span><h1 id="heroTitle">Carregando lista...</h1><p id="heroDesc" style="color:#bbb;font-size:13px;margin:6px 0 10px">Aguarde</p><button class="btn btn-play" onclick="playFirst()">▶ Assistir</button></div>
 </div>
-</div>
-<div id="statusBar"><span class="dot"></span><span id="status">Conectando...</span><span id="status2" style="margin-left:auto;color:#555"></span></div>
+<div id="statusBar"><span class="dot"></span><span id="status">Iniciando...</span><span id="status2" style="margin-left:auto"></span></div>
+<div id="log"></div>
 <div class="rows" id="rows"></div>
-<div id="playerModal">
-<div class="player-top"><div class="player-top-left"><button class="btn" style="background:#222;color:#fff;padding:6px 12px" onclick="closePlayer()">◀ Voltar</button><div><div id="nowPlaying">-</div><div id="playerStatus">Carregando...</div></div></div><button class="btn" style="background:var(--red);color:#fff;padding:6px 14px" onclick="closePlayer()">✕</button></div>
-<div id="videoWrap"><div id="spinner"></div><video id="video" controls playsinline preload="auto"></video></div>
-</div>
+<div id="playerModal"><div class="player-top"><button class="btn" style="background:#222;color:#fff;padding:6px 12px" onclick="closePlayer()">◀ Voltar</button><div style="text-align:right"><div id="nowPlaying" style="font-weight:700;font-size:13px"></div><div id="playerStatus" style="font-size:11px;color:#999"></div></div></div><div id="videoWrap"><div id="spinner"></div><video id="video" controls playsinline preload="auto"></video></div></div>
 <script>
-const URL_DA_SUA_LISTA = "http://e.guecdn.online/p/998641729/424695392/m3u";
-const PROXIES = ["https://cors.luckydesigner.workers.dev/?", "https://corsproxy.io/?", "https://api.allorigins.win/raw?url="];
-let allChannels=[]; let filtered=[]; let currentFilter='all'; let hls=null;
+const URL_M3U = "http://e.guecdn.online/p/998641729/424695392/m3u";
+let allChannels=[], filtered=[], currentFilter='all', hls=null;
+function log(m){document.getElementById('log').innerText+=m+"\n";console.log(m);}
 function classifyChannel(name,group){
  const s=(name+" "+group).toLowerCase();
- if(s.includes("filme")||s.includes("movie")||s.includes("cinema")||s.includes("vod")&&!s.includes("serie")) return "filme";
- if(s.includes("série")||s.includes("serie")||s.includes("temporada")||s.includes("episod")||s.includes("novela")||s.includes("anime")) return "serie";
+ if(s.includes("filme")||s.includes("movie")||s.includes("cinema")||(s.includes("vod") && !s.includes("serie"))) return "filme";
+ if(s.includes("série")||s.includes("serie")||s.includes("temporada")||s.includes("epis")||s.includes("novela")||s.includes("anime")||s.includes("dorama")) return "serie";
  return "tv";
 }
 function parseM3U(text){
@@ -100,11 +79,11 @@ function parseM3U(text){
  for(let i=0;i<lines.length;i++){
   const line=lines[i].trim();
   if(line.startsWith("#EXTINF")){
-   const nameMatch=line.match(/,(.*)$/);const name=nameMatch?nameMatch[1].trim():"Canal";
-   const groupMatch=line.match(/group-title="([^"]+)"/);const group=groupMatch?groupMatch[1]:"Geral";
-   const logoMatch=line.match(/tvg-logo="([^"]+)"/);const logo=logoMatch?logoMatch[1]:"";
+   const name=(line.match(/,(.*)$/)||["","Canal"])[1].trim();
+   const group=(line.match(/group-title="([^"]+)"/)||[,"Geral"])[1];
+   const logo=(line.match(/tvg-logo="([^"]+)"/)||["",""])[1];
    const url=(lines[i+1]||"").trim();
-   if(url&&url.startsWith("http")){const type=classifyChannel(name,group);chans.push({name,group,logo:logo||`https://picsum.photos/seed/${encodeURIComponent(name)}/300/450`,url,type});}
+   if(url.startsWith("http")) chans.push({name,group,logo:logo||`https://picsum.photos/seed/${encodeURIComponent(name)}/300/450`,url,type:classifyChannel(name,group)});
   }
  }
  return chans;
@@ -112,32 +91,65 @@ function parseM3U(text){
 function setFilter(f){currentFilter=f;document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.filter===f));applyFilters();}
 function applyFilters(){
  const q=document.getElementById("searchInput").value.toLowerCase().trim();
- filtered=allChannels.filter(c=>{const matchFilter=currentFilter==='all'||c.type===currentFilter;const matchSearch=!q||c.name.toLowerCase().includes(q)||c.group.toLowerCase().includes(q);return matchFilter&&matchSearch;});
+ filtered=allChannels.filter(c=>{const mf=currentFilter==='all'||c.type===currentFilter;const ms=!q||c.name.toLowerCase().includes(q)||c.group.toLowerCase().includes(q);return mf&&ms;});
  renderByCategory(filtered);
 }
 function renderByCategory(channels){
  const rowsDiv=document.getElementById("rows");rowsDiv.innerHTML="";
- if(!channels.length){rowsDiv.innerHTML='<div class="empty">Nenhum conteúdo encontrado 🔍</div>';return;}
+ if(!channels.length){rowsDiv.innerHTML='<div style="padding:40px;text-align:center;color:#666">Nenhum conteúdo nesse filtro</div>';return;}
  const groups={};channels.forEach(c=>{if(!groups[c.group])groups[c.group]=[];groups[c.group].push(c);});
- Object.keys(groups).sort().forEach(groupName=>{
-  const items=groups[groupName];const sampleType=items[0]?.type||'tv';const isPoster=sampleType!=='tv';
-  const row=document.createElement("div");row.className="row";
-  row.innerHTML=`<div class="row-head"><h2>${groupName}</h2><span class="count">${items.length} títulos</span></div><div class="carousel"></div>`;
-  rowsDiv.appendChild(row);const carousel=row.querySelector(".carousel");
+ Object.keys(groups).sort().forEach(g=>{
+  const items=groups[g];const row=document.createElement("div");row.className="row";
+  row.innerHTML=`<div style="display:flex;justify-content:space-between;margin-bottom:8px"><h2 style="font-size:16px">${g}</h2><span style="color:#666;font-size:11px">${items.length}</span></div><div class="carousel"></div>`;
+  rowsDiv.appendChild(row);const car=row.querySelector(".carousel");
   items.forEach(ch=>{
-   const card=document.createElement("div");card.className=`card ${ch.type==='tv'?'':ch.type}`;
-   const liveBadge=ch.type==='tv'?'<div class="live">AO VIVO</div>':'';card.innerHTML=`${liveBadge}<img loading="lazy" src="${ch.logo}" onerror="this.src='https://via.placeholder.com/300x450/222/666?text=${encodeURIComponent(ch.name.slice(0,15))}'"><div class="title">${ch.name}</div>`;
-   card.onclick=()=>{play(ch.url,ch.name,ch.logo);updateHero(ch);};carousel.appendChild(card);
+   const card=document.createElement("div");card.className=`card ${ch.type==='tv'?'':'movie'}`;const badge=ch.type==='tv'?'<div class="live">AO VIVO</div>':'';
+   card.innerHTML=`${badge}<img loading="lazy" src="${ch.logo}" onerror="this.src='https://via.placeholder.com/300x450/222/666?text=FLIX'"><div class="title">${ch.name}</div>`;
+   card.onclick=()=>{play(ch.url,ch.name);updateHero(ch);};car.appendChild(card);
   });
  });
 }
-function updateHero(ch){document.getElementById("heroTitle").innerText=ch.name;document.getElementById("heroDesc").innerText=ch.group+" • "+(ch.type==='tv'?'AO VIVO':ch.type==='filme'?'FILME':'SÉRIE');document.getElementById("heroBadge").innerText=ch.type==='tv'?'AO VIVO':ch.type.toUpperCase();if(ch.logo)document.getElementById("hero").style.backgroundImage=`url(${ch.logo})`;}
+function updateHero(ch){document.getElementById("heroTitle").innerText=ch.name;document.getElementById("heroDesc").innerText=ch.group+" • "+ch.type.toUpperCase();document.getElementById("heroBadge").innerText=ch.type==='tv'?'AO VIVO':ch.type.toUpperCase();if(ch.logo)document.getElementById("hero").style.backgroundImage=`url(${ch.logo})`;}
 async function loadAuto(){
  const statusEl=document.getElementById("status");
  try{
-  statusEl.innerText="Baixando lista...";let text=null;
-  for(let p of PROXIES){try{const urlFetch=p.includes("allorigins")||p.includes("corsproxy.io")?p+encodeURIComponent(URL_DA_SUA_LISTA):p+URL_DA_SUA_LISTA;const res=await fetch(urlFetch);if(res.ok){text=await res.text();if(text.includes("#EXTINF"))break;}}catch(e){continue;}}
-  if(!text||!text.includes("#EXTINF")){const r=await fetch("./playlist.m3u?v="+Date.now());if(r.ok)text=await r.text();}
-  if(!text)throw new Error("Lista vazia");const chans=parseM3U(text);allChannels=chans;
-  document.getElementById("c-all").innerText=chans.length;document.getElementById("c-tv").innerText=chans.filter(c=>c.type==='tv').length;document.getElementById("c-filme").innerText=chans.filter(c=>c.type==='filme').length;document.getElementById("c-serie").innerText=chans.filter(c=>c.type==='serie').length;
-  statusEl.innerText=chans.length+" conteúdos organizados";
+  log("Tentativa 1: lucky designer");
+  let text=null;
+  let proxies=[
+    {url:"https://cors.luckydesigner.workers.dev/?"+URL_M3U,name:"lucky"},
+    {url:"https://corsproxy.io/?"+encodeURIComponent(URL_M3U),name:"corsproxy"},
+    {url:"https://api.allorigins.win/raw?url="+encodeURIComponent(URL_M3U),name:"allorigins"}
+  ];
+  for(let p of proxies){
+   try{statusEl.innerText="Testando "+p.name+"...";log("→ "+p.name);const res=await fetch(p.url);log(" status "+res.status);if(res.ok){const t=await res.text();log(" tamanho "+t.length);if(t.includes("#EXTINF")){text=t;log(" OK tem EXTINF");break;}}}catch(e){log(" erro "+e.message);}
+  }
+  if(!text||!text.includes("#EXTINF")){
+   log("Tentando playlist.m3u local");statusEl.innerText="Tentando playlist.m3u local...";
+   try{const r=await fetch("./playlist.m3u?v="+Date.now());if(r.ok){text=await r.text();log("local "+text.length);}}catch(e){log("local erro "+e.message);}
+  }
+  if(!text) throw new Error("Nenhuma lista. Baixe o link e suba como playlist.m3u");
+  const chans=parseM3U(text);
+  if(!chans.length) throw new Error("M3U sem canais. Inicio: "+text.slice(0,200));
+  allChannels=chans;
+  document.getElementById("c-all").innerText=chans.length;
+  document.getElementById("c-tv").innerText=chans.filter(c=>c.type==='tv').length;
+  document.getElementById("c-filme").innerText=chans.filter(c=>c.type==='filme').length;
+  document.getElementById("c-serie").innerText=chans.filter(c=>c.type==='serie').length;
+  statusEl.innerText=chans.length+" conteúdos";document.getElementById("status2").innerText=new Date().toLocaleTimeString();
+  if(chans.length)updateHero(chans[0]);applyFilters();document.getElementById("log").style.display="none";
+ }catch(err){statusEl.innerText="Erro: "+err.message;log("ERRO FINAL "+err.message);}
+}
+function play(url,title){
+ const modal=document.getElementById("playerModal");const video=document.getElementById("video");const status=document.getElementById("playerStatus");const spinner=document.getElementById("spinner");
+ document.getElementById("nowPlaying").innerText=title;status.innerText="Conectando...";spinner.style.display="block";modal.classList.add("active");
+ if(hls){try{hls.destroy();}catch(e){}hls=null;}video.pause();video.removeAttribute("src");video.load();
+ const cfg={enableWorker:true,lowLatencyMode:true,backBufferLength:12,maxBufferLength:15,liveSyncDurationCount:2};
+ if(Hls.isSupported()){hls=new Hls(cfg);hls.loadSource(url);hls.attachMedia(video);hls.on(Hls.Events.MANIFEST_PARSED,()=>{status.innerText="Ao Vivo • HLS";spinner.style.display="none";video.play().catch(()=>{});});hls.on(Hls.Events.ERROR,(ev,d)=>{if(d.fatal){status.innerText="Erro "+d.type;spinner.style.display="none";}});}
+ else{video.src=url;video.play();spinner.style.display="none";status.innerText="Reproduzindo";}
+}
+function closePlayer(){document.getElementById("playerModal").classList.remove("active");const v=document.getElementById("video");v.pause();v.removeAttribute("src");v.load();if(hls){try{hls.destroy();}catch(e){}hls=null;}document.getElementById("spinner").style.display="none";}
+function playFirst(){if(filtered.length)play(filtered[0].url,filtered[0].name);}
+loadAuto();
+</script>
+</body>
+</html>
